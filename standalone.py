@@ -744,10 +744,10 @@ Instant VM recovery: mount the backup as a live VM in seconds.""",
 
 @st.cache_resource(show_spinner=False)
 def build_kb(_groq_key: str):
-    from langchain_community.embeddings import HuggingFaceEmbeddings
+    from langchain_huggingface import HuggingFaceEmbeddings
     from langchain_community.vectorstores import FAISS
-    from langchain.text_splitter import RecursiveCharacterTextSplitter
-    from langchain.schema import Document
+    from langchain_text_splitters import RecursiveCharacterTextSplitter
+    from langchain_core.documents import Document
 
     index_dir = Path("data/kb_index")
     embeddings = HuggingFaceEmbeddings(
