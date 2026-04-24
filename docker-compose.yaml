@@ -1,0 +1,82 @@
+version: "3.9"
+
+services:
+  api:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    env_file: .env
+    volumes:
+      - ./data/kb_index:/app/data/kb_index
+      - ./data/kb_source_docs:/app/data/kb_source_docs
+      - ./data/logs:/app/data/logs
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: supportpilot
+      POSTGRES_USER: sp_user
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-localdev}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sp_user -d supportpilot"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  # Runs the KB scraper + ingestion pipeline as a one-off job
+  kb_ingestion:
+    build: ./backend
+    command: python -m src.kb.scraper
+    env_file: .env
+    volumes:
+      - ./data/kb_source_docs:/app/data/kb_source_docs
+      - ./data/kb_index:/app/data/kb_index
+    depends_on:
+      - postgres
+    profiles:
+      - tools  # Only runs with: docker-compose --profile tools up kb_ingestion
+
+  # APScheduler-based background jobs (reminders, reporting)
+  scheduler:
+    build: ./backend
+    command: python -m src.scheduler
+    env_file: .env
+    volumes:
+      - ./data/logs:/app/data/logs
+    depends_on:
+      - postgres
+      - redis
+      - api
+    restart: unless-stopped
+
+volumes:
+  pg_data:
+  redis_data:

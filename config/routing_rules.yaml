@@ -1,0 +1,63 @@
+# SupportPilot Routing Rules
+# Edit this file to change routing logic without touching any code.
+# Rules evaluate top-to-bottom. First match wins.
+#
+# trigger_field:    any column on the Ticket model
+# trigger_operator: eq | neq | contains | startswith | gt | lt
+# action_type:      route | set_priority | escalate | tag
+# action_params:    JSON dict of values to apply
+
+rules:
+  - name: production_down_always_p1
+    description: Any ticket mentioning production being down is P1, no exceptions
+    trigger_field: body
+    trigger_operator: contains
+    trigger_value: "production"
+    action_type: set_priority
+    action_params: '{"priority": "P1"}'
+    is_active: true
+
+  - name: enterprise_backup_failures_to_senior
+    description: Enterprise accounts with backup failures go to the senior team
+    trigger_field: customer_tier
+    trigger_operator: eq
+    trigger_value: enterprise
+    action_type: route
+    action_params: '{"assigned_team": "senior_backup_team"}'
+    is_active: true
+
+  - name: trial_accounts_self_service_first
+    description: Trial users go to self-service queue first
+    trigger_field: customer_tier
+    trigger_operator: eq
+    trigger_value: trial
+    action_type: route
+    action_params: '{"assigned_team": "self_service"}'
+    is_active: true
+
+  - name: cleanroom_recovery_to_specialists
+    description: Cleanroom Recovery questions always need specialist handling
+    trigger_field: body
+    trigger_operator: contains
+    trigger_value: cleanroom
+    action_type: route
+    action_params: '{"assigned_team": "recovery_specialists"}'
+    is_active: true
+
+  - name: billing_to_billing_team
+    description: All billing queries go directly to billing, not general support
+    trigger_field: intent
+    trigger_operator: eq
+    trigger_value: billing
+    action_type: route
+    action_params: '{"assigned_team": "billing_team"}'
+    is_active: true
+
+  - name: feature_requests_to_product
+    description: Feature requests are not support tickets
+    trigger_field: intent
+    trigger_operator: eq
+    trigger_value: feature_request
+    action_type: route
+    action_params: '{"assigned_team": "product_team"}'
+    is_active: true

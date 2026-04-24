@@ -1,0 +1,48 @@
+
+.streamlit/secrets.toml
+backend/src/.env
+backend/.env
+.env
+*.env
+
+# DATABASE — contains real data from your testing sessions
+
+data/aegis.db
+data/sp.db
+data/*.db
+
+# FAISS INDEX — large binary, auto-rebuilds on first run
+
+data/kb_index/
+
+
+# VIRTUAL ENVIRONMENT — 200MB+, not needed in repo
+
+.venv/
+venv/
+env/
+ENV/
+
+
+# PYTHON CACHE — auto-generated, not needed
+
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.coverage
+htmlcov/
+coverage.xml
+CACHEDIR.TAG
+
+# OS FILES
+
+.DS_Store
+Thumbs.db
+desktop.ini
+
+
+# LOGS
+
+*.log
+logs/

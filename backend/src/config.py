@@ -11,41 +11,32 @@ class Settings(BaseSettings):
         case_sensitive=False,
     )
 
-    # Groq
     groq_api_key: str = ""
-    groq_model: str = "llama3-8b-8192"
+    groq_model: str = "llama-3.3-70b-versatile"
 
-    # Embeddings
     embed_model: str = "sentence-transformers/all-MiniLM-L6-v2"
 
-    # Database
-    postgres_url: str = "postgresql+asyncpg://postgres:YOUR_PASSWORD@localhost:5433/supportpilot"
+    postgres_url: str = "postgresql+asyncpg://sp_user:localdev@localhost:5432/supportpilot"
 
-    # Redis
     redis_url: str = "redis://localhost:6379"
 
-    # Auth
     secret_key: str = "change-this-in-production"
     admin_api_key: str = "admin-dev-key"
 
-    # Email
-    sendgrid_api_key: str = "SG..."
-    from_email: str = "support@supportpilot.demo"
+    sendgrid_api_key: str = ""
+    from_email: str = "support@aegis.demo"
     imap_host: str = "imap.gmail.com"
-    imap_user: str = "your@gmail.com"
-    imap_password: str = "your-app-password"
+    imap_user: str = ""
+    imap_password: str = ""
 
-    # RAG
-    rag_confidence_threshold: float = 0.55
-    rag_top_k: int = 4
-    rag_chunk_size: int = 800
-    rag_chunk_overlap: int = 100
+    rag_confidence_threshold: float = 0.35
+    rag_top_k: int = 5
+    rag_chunk_size: int = 700
+    rag_chunk_overlap: int = 80
 
-    # Paths
     kb_index_path: str = "data/kb_index"
     kb_source_path: str = "data/kb_source_docs"
 
-    # App
     app_env: str = "development"
 
     @property
